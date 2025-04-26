@@ -19,9 +19,15 @@ POPUS.forEach((popup) => {
 
 function closePopup(popup) {
     popup.classList.remove("popup_is-opened");
+    document.removeEventListener('keydown', closeByEsc);
 }
 
-
+function closeByEsc(evt) {
+    if (evt.key === "Escape") {
+        const openedPopup = document.querySelector('.popup_is-opened');
+        closePopup(openedPopup);
+    }
+}
 
 function onEditProfile(event) {
     const nameInput = PROFILE_POPUP.querySelector(".popup__input_type_name");
@@ -92,6 +98,7 @@ function openModal(popup) {
         });
     }
     popup.classList.add("popup_is-opened");
+    document.addEventListener('keydown', closeByEsc);
 }
 
 function createCard(title, imgLink) {
