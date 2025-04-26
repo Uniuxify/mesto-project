@@ -1,0 +1,10 @@
+.popup__input-error {
+    margin-top: 5px;
+    font-size: 12px;
+    color: red;
+    visibility: visible;
+}
+
+.popup__input-error:empty::before {
+    content:"\200B";
+}
