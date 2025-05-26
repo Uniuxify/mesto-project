@@ -1,8 +1,10 @@
 import {enableValidation, toggleButtonState, hideInputError} from './validation.js'
-import {createCard, prependCard, appendCard}from './cards.js'
+import {createAndAddCard}from './cards.js'
+import { updateUserProfile, updateUserAva } from './user.js';
 
 const CARD_POPUP = document.querySelector(".popup_type_new-card");
 const PROFILE_POPUP = document.querySelector(".popup_type_edit");
+const AVA_POPUP = document.querySelector(".popup_type_ava");
 
 const POPUS = document.querySelectorAll(".popup");
 POPUS.forEach((popup) => {
@@ -40,16 +42,112 @@ function onEditProfile(event) {
     openModal(PROFILE_POPUP);
 }
 
+function onEditAva(event) {
+    const linkInput = AVA_POPUP.querySelector(".popup__input_type_url");
+
+    linkInput.value = PROFILE.querySelector(".profile__image").textContent;
+
+    openModal(AVA_POPUP);
+}
+
+// function onSubmitEditProfileForm(event) {
+//     event.preventDefault();
+
+//     const nameInputValue = PROFILE_POPUP.querySelector(".popup__input_type_name").value;
+//     const descriptionInputValue = PROFILE_POPUP.querySelector(".popup__input_type_description").value;
+
+//     updateUserProfile(nameInputValue, descriptionInputValue, null)
+//     closePopup(PROFILE_POPUP);
+// }
+
+// function onSubmitAvaForm(event) {
+//     event.preventDefault();
+    
+//     const linkInput = AVA_POPUP.querySelector(".popup__input_type_url").value;
+
+//     updateUserAva(linkInput);
+//     closePopup(AVA_POPUP);
+// }
+
 function onSubmitEditProfileForm(event) {
     event.preventDefault();
+    const button = PROFILE_POPUP.querySelector('.popup__button');
+    const originalText = button.textContent;
+    
+    button.textContent = 'Сохранение...';
+    button.disabled = true;
 
     const nameInputValue = PROFILE_POPUP.querySelector(".popup__input_type_name").value;
     const descriptionInputValue = PROFILE_POPUP.querySelector(".popup__input_type_description").value;
 
-    PROFILE.querySelector(".profile__title").textContent = nameInputValue;
-    PROFILE.querySelector(".profile__description").textContent = descriptionInputValue;
+    updateUserProfile(nameInputValue, descriptionInputValue, null)
+        .then(() => {
+            closePopup(PROFILE_POPUP);
+        })
+        .catch(err => {
+            console.error('Ошибка при сохранении:', err);
+        })
+        .finally(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+        });
+}
 
-    closePopup(PROFILE_POPUP);
+// Обновленная функция для отправки формы аватара
+function onSubmitAvaForm(event) {
+    event.preventDefault();
+    const button = AVA_POPUP.querySelector('.popup__button');
+    const originalText = button.textContent;
+    
+    button.textContent = 'Сохранение...';
+    button.disabled = true;
+
+    const linkInput = AVA_POPUP.querySelector(".popup__input_type_url").value;
+
+    updateUserAva(linkInput)
+        .then(() => {
+            closePopup(AVA_POPUP);
+        })
+        .catch(err => {
+            console.error('Ошибка при сохранении:', err);
+        })
+        .finally(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+        });
+}
+
+
+// function onSubmitNewCardForm(event) {
+//     event.preventDefault();
+//     const nameInput = CARD_POPUP.querySelector(".popup__input_type_card-name").value;
+//     const linkInput = CARD_POPUP.querySelector(".popup__input_type_url").value;
+//     createAndAddCard(nameInput, linkInput);
+//     closePopup(CARD_POPUP);
+// }
+
+function onSubmitNewCardForm(event) {
+    event.preventDefault();
+    const button = CARD_POPUP.querySelector('.popup__button');
+    const originalText = button.textContent;
+    
+    button.textContent = 'Сохранение...';
+    button.disabled = true;
+
+    const nameInput = CARD_POPUP.querySelector(".popup__input_type_card-name").value;
+    const linkInput = CARD_POPUP.querySelector(".popup__input_type_url").value;
+
+    createAndAddCard(nameInput, linkInput)
+        .then(() => {
+            closePopup(CARD_POPUP);
+        })
+        .catch(err => {
+            console.error('Ошибка при сохранении:', err);
+        })
+        .finally(() => {
+            button.textContent = originalText;
+            button.disabled = false;
+        });
 }
 
 const PROFILE = document.querySelector(".profile");
@@ -60,6 +158,12 @@ PROFILE.querySelector(".profile__edit-button").addEventListener(
     onEditProfile
 );
 
+AVA_POPUP.querySelector('.popup__form').addEventListener('submit', onSubmitAvaForm);
+PROFILE.querySelector(".profile__image-container").addEventListener(
+    "click",
+    onEditAva
+);
+
 function onNewCard(event) {
     
     CARD_POPUP.querySelector(".popup__input_type_card-name").value = '';
@@ -68,15 +172,6 @@ function onNewCard(event) {
     openModal(CARD_POPUP);
 }
 
-function onSubmitNewCardForm(event) {
-    event.preventDefault();
-    const nameInput = CARD_POPUP.querySelector(".popup__input_type_card-name").value;
-    const linkInput = CARD_POPUP.querySelector(".popup__input_type_url").value;
-    
-    const newCard = createCard(nameInput, linkInput);
-    prependCard(newCard);
-    closePopup(CARD_POPUP);
-}
 
 PROFILE.querySelector(".profile__add-button").addEventListener(
     "click",
